@@ -1,34 +1,34 @@
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
+const { Pool } = require('pg');
+require('dotenv').config();
+
+// 创建数据库连接池
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
 
 // 连接到数据库
-const dbPath = path.resolve(__dirname, '../../数据库/users.db');
-let db = null;
-
-function connectDB() {
-  return new Promise((resolve, reject) => {
-    if (db) {
-      resolve(db);
-      return;
-    }
-    
-    db = new sqlite3.Database(dbPath, (err) => {
-      if (err) {
-        console.error('无法连接到数据库:', err.message);
-        reject(err);
-      } else {
-        console.log('成功连接到SQLite数据库');
-        resolve(db);
-      }
-    });
-  });
-}
-
-function closeDB() {
-  if (db) {
-    db.close();
-    db = null;
+async function connectDB() {
+  try {
+    await pool.connect();
+    console.log('成功连接到PostgreSQL数据库');
+    return pool;
+  } catch (error) {
+    console.error('数据库连接失败:', error);
+    throw error;
   }
 }
 
-module.exports = { connectDB, closeDB };
+// 关闭数据库连接
+async function closeDB() {
+  try {
+    await pool.end();
+    console.log('数据库连接已关闭');
+  } catch (error) {
+    console.error('关闭数据库连接失败:', error);
+  }
+}
+
+module.exports = { connectDB, closeDB, pool };

@@ -1,10 +1,12 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const { connectDB, closeDB } = require('./config/db');
+const { initTables } = require('./config/initDB');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // 中间件
 app.use(cors());
@@ -23,6 +25,7 @@ app.get('/api/health', (req, res) => {
 app.listen(PORT, async () => {
   try {
     await connectDB();
+    await initTables(); // 初始化数据库表
     console.log(`服务器运行在 http://localhost:${PORT}`);
   } catch (error) {
     console.error('启动服务器失败:', error);
