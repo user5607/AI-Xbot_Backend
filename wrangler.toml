@@ -1,11 +1,11 @@
-name = "ai-xbot-backend"
+name = "aixbot-worker"
 compatibility_date = "2025-12-10"
 main = "server.js"
 
-account_id = "$CLOUDFLARE_ACCOUNT_ID"
+account_id = "9b465668c4d3a03532bc68088cdf3909"
 workers_dev = true
 
 [[d1_databases]]
 binding = "DB"
-database_name = "ai-xbot-db"
+database_name = "aixbot-db"
 database_id = "$D1_DATABASE_ID"
