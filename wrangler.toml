@@ -3,14 +3,11 @@ type = "javascript"
 
 account_id = "$CLOUDFLARE_ACCOUNT_ID"
 workers_dev = true
-env {
-  DB = {
-    binding = "DB"
-    type = "d1"
-    database_name = "ai-xbot-db"
-    database_id = "$D1_DATABASE_ID"
-  }
-}
+
+[[d1_databases]]
+binding = "DB"
+database_name = "ai-xbot-db"
+database_id = "$D1_DATABASE_ID"
 
 [build.upload]
 format = "modules"
