@@ -1,6 +1,14 @@
 // Cloudflare Workers 兼容版本
 import { verifyPassword } from '../utils/password';
 
+// CORS配置
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Access-Control-Max-Age': '86400',
+};
+
 // 登录接口
 export async function loginHandler(req, res) {
   try {
@@ -14,7 +22,10 @@ export async function loginHandler(req, res) {
       return new Response(JSON.stringify({ 
         success: false, 
         message: '请填写完整的登录信息' 
-      }), { status: 400 });
+      }), { 
+        status: 400, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      });
     }
     
     // 查询用户信息 - 根据角色使用不同的查询条件
@@ -48,7 +59,10 @@ export async function loginHandler(req, res) {
       return new Response(JSON.stringify({ 
         success: false, 
         message: '用户名或密码错误' 
-      }), { status: 401 });
+      }), { 
+        status: 401, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      });
     }
     
     // 验证密码（使用bcryptjs进行密码验证）
@@ -59,14 +73,20 @@ export async function loginHandler(req, res) {
         return new Response(JSON.stringify({ 
           success: false, 
           message: '用户名或密码错误' 
-        }), { status: 401 });
+        }), { 
+          status: 401, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        });
       }
     } catch (verifyError) {
       console.error('密码验证错误:', verifyError);
       return new Response(JSON.stringify({ 
         success: false, 
         message: '服务器错误' 
-      }), { status: 500 });
+      }), { 
+        status: 500, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      });
     }
     
     // 返回用户信息（不包含密码）
@@ -87,14 +107,20 @@ export async function loginHandler(req, res) {
       success: true, 
       message: '登录成功', 
       user: userInfo
-    }), { status: 200 });
+    }), { 
+      status: 200, 
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+    });
     
   } catch (error) {
     console.error('登录错误:', error);
     return new Response(JSON.stringify({ 
       success: false, 
       message: '服务器错误' 
-    }), { status: 500 });
+    }), { 
+      status: 500, 
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+    });
   }
 }
 
