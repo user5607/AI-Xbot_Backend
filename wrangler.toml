@@ -1,5 +1,6 @@
 name = "ai-xbot-backend"
-type = "javascript"
+compatibility_date = "2025-12-10"
+main = "server.js"
 
 account_id = "$CLOUDFLARE_ACCOUNT_ID"
 workers_dev = true
@@ -8,7 +9,3 @@ workers_dev = true
 binding = "DB"
 database_name = "ai-xbot-db"
 database_id = "$D1_DATABASE_ID"
-
-[build.upload]
-format = "modules"
-main = "server.js"
