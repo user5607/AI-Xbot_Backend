@@ -1,23 +1,13 @@
-const { Pool } = require('pg');
-require('dotenv').config();
-// 引入hashPassword工具函数
-const { hashPassword } = require('../utils/password');
-
-// 创建数据库连接池
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+// Cloudflare D1 数据库初始化配置
+import { hashPassword } from '../utils/password';
 
 // 初始化表结构
-async function initTables() {
+async function initTables(db) {
   try {
-    // 创建users表
-    await pool.query(`
+    // 创建users表 - 使用SQLite语法
+    await db.execute(`
       CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         role TEXT NOT NULL,
         username TEXT NOT NULL,
         password TEXT NOT NULL,
@@ -36,14 +26,14 @@ async function initTables() {
     console.log('成功创建users表');
     
     // 异步插入示例数据
-    await insertSampleData();
+    await insertSampleData(db);
   } catch (error) {
     console.error('初始化数据库失败:', error);
   }
 }
 
 // 异步插入示例数据
-async function insertSampleData() {
+async function insertSampleData(db) {
   const sampleUsers = [
     // 学生用户 - 按照要求修改为安生学校，王宇，学号202501001
     { role: 'student', username: 'student1', password: '123456', real_name: '王宇', school: '安生学校', student_id: '202501001' },
@@ -60,12 +50,12 @@ async function insertSampleData() {
       console.log(`已哈希用户密码: ${user.username}`);
     }
     
-    // 插入数据
+    // 插入数据 - 使用SQLite语法
     for (const user of sampleUsers) {
-      await pool.query(`
+      await db.execute(`
         INSERT INTO users 
         (role, username, password, real_name, school, student_id, teacher_id, parent_id, child_name)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT (role, username) DO NOTHING
       `, [
         user.role,
@@ -87,15 +77,4 @@ async function insertSampleData() {
 }
 
 // 导出初始化函数
-module.exports = { initTables };
-
-// 如果直接运行该文件，则初始化数据库
-if (require.main === module) {
-  initTables().then(() => {
-    console.log('数据库初始化完成');
-    pool.end();
-  }).catch(err => {
-    console.error('数据库初始化失败:', err);
-    pool.end();
-  });
-}
+export { initTables };
