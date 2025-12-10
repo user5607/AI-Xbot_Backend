@@ -15,11 +15,22 @@ export async function addUserHandler(req, res) {
       }), { status: 400 });
     }
     
-    // 检查用户名是否已存在 - 使用SQLite语法
-    const checkResult = await db.execute(
-      'SELECT * FROM users WHERE role = ? AND username = ?',
-      [role, username]
-    );
+    // 检查用户名是否已存在 - 根据角色使用不同的检查条件
+    let checkQuery = '';
+    let checkParams = [];
+    
+    if (role === 'student') {
+      checkQuery = 'SELECT * FROM user WHERE role = ? AND (name = ? OR student_id = ?)';
+      checkParams = [role, username, username];
+    } else if (role === 'teacher') {
+      checkQuery = 'SELECT * FROM user WHERE role = ? AND (name = ? OR teacher_id = ?)';
+      checkParams = [role, username, username];
+    } else {
+      checkQuery = 'SELECT * FROM user WHERE role = ? AND name = ?';
+      checkParams = [role, username];
+    }
+    
+    const checkResult = await db.execute(checkQuery, checkParams);
     
     if (checkResult.results.length > 0) {
       return new Response(JSON.stringify({ 
@@ -31,11 +42,11 @@ export async function addUserHandler(req, res) {
     // 插入新用户 - 使用SQLite语法
     const hashedPassword = await hashPassword(password);
     const result = await db.execute(
-      `INSERT INTO users 
-       (role, username, password, real_name, school, student_id, teacher_id, child_name) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `INSERT INTO user 
+       (role, name, encrypted_pwd, school, student_id, teacher_id, child_name) 
+       VALUES (?, ?, ?, ?, ?, ?, ?)
        RETURNING id`,
-      [role, username, hashedPassword, realName, school, studentId, teacherId, childName]
+      [role, realName, hashedPassword, school, studentId, teacherId, childName]
     );
     
     return new Response(JSON.stringify({
@@ -60,10 +71,19 @@ export async function getUserListHandler(req, res) {
     const role = url.pathname.split('/').pop(); // 获取最后一个路径参数
     const db = req.env.DB;
     
-    const result = await db.execute(
-      'SELECT id, role, username, real_name, school, student_id, teacher_id, child_name, created_at FROM users WHERE role = ? ORDER BY created_at DESC',
-      [role]
-    );
+    let query = '';
+    let params = [];
+    
+    if (role && role !== 'all') {
+      // 根据角色获取用户
+      query = 'SELECT id, role, name, school, student_id, teacher_id, child_name FROM user WHERE role = ? ORDER BY id DESC';
+      params = [role];
+    } else {
+      // 获取所有用户
+      query = 'SELECT id, role, name, school, student_id, teacher_id, child_name FROM user ORDER BY id DESC';
+    }
+    
+    const result = await db.execute(query, params);
     
     return new Response(JSON.stringify({
       success: true,

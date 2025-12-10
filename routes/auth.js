@@ -17,17 +17,25 @@ export async function loginHandler(req, res) {
       }), { status: 400 });
     }
     
-    // 查询用户信息 - 学生特殊处理，允许通过学号或用户名登录
+    // 查询用户信息 - 根据角色使用不同的查询条件
     let query = '';
     let params = [];
     
     if (role === 'student') {
-      // 对于学生，可以通过username或student_id查找 - 使用SQLite语法
-      query = 'SELECT * FROM users WHERE role = ? AND (username = ? OR student_id = ?) AND is_active = 1';
+      // 对于学生，可以通过name或student_id查找
+      query = 'SELECT * FROM user WHERE role = ? AND (name = ? OR student_id = ?)';
+      params = [role, username, username];
+    } else if (role === 'teacher') {
+      // 对于教师，可以通过name或teacher_id查找
+      query = 'SELECT * FROM user WHERE role = ? AND (name = ? OR teacher_id = ?)';
+      params = [role, username, username];
+    } else if (role === 'parent') {
+      // 对于家长，可以通过name或child_name查找
+      query = 'SELECT * FROM user WHERE role = ? AND (name = ? OR child_name = ?)';
       params = [role, username, username];
     } else {
-      // 其他角色继续使用原来的查询 - 使用SQLite语法
-      query = 'SELECT * FROM users WHERE role = ? AND username = ? AND is_active = 1';
+      // 其他角色默认通过name查找
+      query = 'SELECT * FROM user WHERE role = ? AND name = ?';
       params = [role, username];
     }
     
@@ -36,7 +44,7 @@ export async function loginHandler(req, res) {
     const user = result.results[0];
     
     if (!user) {
-      console.log('用户不存在或未激活');
+      console.log('用户不存在');
       return new Response(JSON.stringify({ 
         success: false, 
         message: '用户名或密码错误' 
@@ -46,7 +54,7 @@ export async function loginHandler(req, res) {
     // 验证密码（使用bcryptjs进行密码验证）
     console.log('找到用户，开始验证密码...');
     try {
-      const isMatch = await verifyPassword(password, user.password);
+      const isMatch = await verifyPassword(password, user.encrypted_pwd);
       if (!isMatch) {
         return new Response(JSON.stringify({ 
           success: false, 
@@ -65,8 +73,7 @@ export async function loginHandler(req, res) {
     const userInfo = {
       id: user.id,
       role: user.role,
-      username: user.username,
-      realName: user.real_name,
+      name: user.name,
       school: user.school,
       studentId: user.student_id,
       teacherId: user.teacher_id,
@@ -76,9 +83,9 @@ export async function loginHandler(req, res) {
     console.log('登录成功，用户信息:', userInfo);
     
     // 简化版：实际应该生成JWT令牌
-    return new Response(JSON.stringify({
-      success: true,
-      message: '登录成功',
+    return new Response(JSON.stringify({ 
+      success: true, 
+      message: '登录成功', 
       user: userInfo
     }), { status: 200 });
     

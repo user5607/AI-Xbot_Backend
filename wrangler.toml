@@ -8,4 +8,4 @@ workers_dev = true
 [[d1_databases]]
 binding = "DB"
 database_name = "aixbot-db"
-database_id = "$D1_DATABASE_ID"
+database_id = "c0937697-dc3c-4af5-9486-25ac3961ab5b"  # 请替换为实际的D1数据库ID
