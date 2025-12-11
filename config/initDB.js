@@ -5,17 +5,17 @@ import { hashPassword } from '../utils/password.js';
 // 初始化表结构
 async function initTables(db) {
   try {
-    // 创建users表 - 使用SQLite语法，在原有结构基础上添加必要字段
+    // 创建users表 - 使用标准SQLite语法，去掉注释避免潜在问题
     await db.execute(`
       CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         school TEXT,
         name TEXT,
         encrypted_pwd TEXT,
-        role TEXT, -- 添加角色字段：student/teacher/parent
-        student_id TEXT, -- 添加学号字段
-        teacher_id TEXT, -- 添加工号字段
-        child_name TEXT -- 添加孩子姓名字段（家长用户使用）
+        role TEXT,
+        student_id TEXT,
+        teacher_id TEXT,
+        child_name TEXT
       )
     `);
     
