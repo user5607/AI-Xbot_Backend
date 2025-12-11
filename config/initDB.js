@@ -11,7 +11,7 @@ async function initTables(db) {
         name TEXT,
         encrypted_pwd TEXT,
         role TEXT, -- 添加角色字段：student/teacher/parent
-        student_id TEXT, -- 添加学号字段
+        student TEXT, -- 添加学号字段（注意：数据库中实际字段名为student）
         teacher_id TEXT, -- 添加工号字段
         child_name TEXT -- 添加孩子姓名字段（家长用户使用）
       )

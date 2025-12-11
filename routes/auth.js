@@ -33,8 +33,8 @@ export async function loginHandler(req, res, env) {
     let params = [];
     
     if (role === 'student') {
-      // 对于学生，可以通过name或student_id查找
-      query = 'SELECT * FROM users WHERE role = ? AND (name = ? OR student_id = ?)';
+      // 对于学生，可以通过name或student查找
+      query = 'SELECT * FROM users WHERE role = ? AND (name = ? OR student = ?)';
       params = [role, username, username];
     } else if (role === 'teacher') {
       // 对于教师，可以通过name或teacher_id查找
@@ -106,7 +106,7 @@ export async function loginHandler(req, res, env) {
       role: user.role,
       name: user.name,
       school: user.school,
-      studentId: user.student_id,
+      studentId: user.student, // 数据库中实际字段名为student
       teacherId: user.teacher_id,
       childName: user.child_name
     };
