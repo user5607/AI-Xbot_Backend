@@ -1,5 +1,6 @@
 // Cloudflare D1 数据库初始化配置
-import { hashPassword } from '../utils/password';
+import { hashPassword } from '../utils/password.js';
+
 
 // 初始化表结构
 async function initTables(db) {
@@ -22,8 +23,10 @@ async function initTables(db) {
     
     // 异步插入示例数据
     await insertSampleData(db);
+    return true;
   } catch (error) {
     console.error('初始化数据库失败:', error);
+    throw error; // 重新抛出错误，让上层能够捕获
   }
 }
 
@@ -40,6 +43,13 @@ async function insertSampleData(db) {
   ];
 
   try {
+    // 先检查是否已有数据，避免重复插入
+    const existingData = await db.execute('SELECT COUNT(*) AS count FROM users WHERE role = ? AND student_id = ?', ['student', '202501001']);
+    if (existingData.results[0].count > 0) {
+      console.log('示例数据已存在，跳过插入');
+      return;
+    }
+
     // 先对所有用户密码进行哈希处理
     for (const user of sampleUsers) {
       user.encrypted_pwd = await hashPassword(user.password);
@@ -66,6 +76,7 @@ async function insertSampleData(db) {
     console.log('成功插入示例数据');
   } catch (error) {
     console.error('插入示例数据失败:', error);
+    throw error; // 重新抛出错误，让上层能够捕获
   }
 }
 

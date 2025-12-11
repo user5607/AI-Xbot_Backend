@@ -10,10 +10,10 @@ const corsHeaders = {
 };
 
 // 添加用户接口
-export async function addUserHandler(req, res) {
+export async function addUserHandler(req, res, env) {
   try {
     const { role, username, password, realName, school, studentId, teacherId, childName } = req.body;
-    const db = req.env.DB;
+    const db = env.DB;
     
     // 验证必填字段
     if (!role || !username || !password || !realName) {
@@ -85,11 +85,11 @@ export async function addUserHandler(req, res) {
 }
 
 // 获取用户列表接口
-export async function getUserListHandler(req, res) {
+export async function getUserListHandler(req, res, env) {
   try {
     const url = new URL(req.url);
     const role = url.pathname.split('/').pop(); // 获取最后一个路径参数
-    const db = req.env.DB;
+    const db = env.DB;
     
     let query = '';
     let params = [];
@@ -126,19 +126,19 @@ export async function getUserListHandler(req, res) {
 }
 
 // 路由处理函数
-export default async function usersRoutes(req, res) {
+export default async function usersRoutes(req, res, env) {
   const url = new URL(req.url);
   const pathname = url.pathname;
   const method = req.method;
   
   // 添加用户接口
   if (pathname === '/api/users/add' && method === 'POST') {
-    return addUserHandler(req, res);
+    return addUserHandler(req, res, env);
   }
   
   // 获取用户列表接口
   if (pathname.startsWith('/api/users/list/') && method === 'GET') {
-    return getUserListHandler(req, res);
+    return getUserListHandler(req, res, env);
   }
   
   // 没有匹配的路由，返回404

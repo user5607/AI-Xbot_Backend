@@ -79,13 +79,13 @@ async function handleRequest(request, env, ctx) {
 
     // 认证路由
     if (pathname.startsWith('/api/auth')) {
-      const authResponse = await authRoutes(req, res);
+      const authResponse = await authRoutes(req, res, env);
       if (authResponse) return authResponse;
     }
 
     // 用户路由
     if (pathname.startsWith('/api/users')) {
-      const usersResponse = await usersRoutes(req, res);
+      const usersResponse = await usersRoutes(req, res, env);
       if (usersResponse) return usersResponse;
     }
 

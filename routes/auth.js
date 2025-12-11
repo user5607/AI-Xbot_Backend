@@ -10,10 +10,10 @@ const corsHeaders = {
 };
 
 // 登录接口
-export async function loginHandler(req, res) {
+export async function loginHandler(req, res, env) {
   try {
     const { role, username, password } = req.body;
-    const db = req.env.DB;
+    const db = env.DB;
     
     // 添加调试日志
     console.log('收到登录请求:', { role, username });
@@ -144,14 +144,14 @@ export async function loginHandler(req, res) {
 }
 
 // 路由处理函数
-export default async function authRoutes(req, res) {
+export default async function authRoutes(req, res, env) {
   const url = new URL(req.url);
   const pathname = url.pathname;
   const method = req.method;
   
   // 登录接口
   if (pathname === '/api/auth/login' && method === 'POST') {
-    return loginHandler(req, res);
+    return loginHandler(req, res, env);
   }
   
   // 没有匹配的路由，返回404
