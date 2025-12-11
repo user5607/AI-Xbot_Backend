@@ -4,9 +4,9 @@ import { hashPassword } from '../utils/password';
 // 初始化表结构
 async function initTables(db) {
   try {
-    // 创建user表 - 使用SQLite语法，在原有结构基础上添加必要字段
+    // 创建users表 - 使用SQLite语法，在原有结构基础上添加必要字段
     await db.execute(`
-      CREATE TABLE IF NOT EXISTS user (
+      CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         school TEXT,
         name TEXT,
@@ -18,7 +18,7 @@ async function initTables(db) {
       )
     `);
     
-    console.log('成功创建user表');
+    console.log('成功创建users表');
     
     // 异步插入示例数据
     await insertSampleData(db);
@@ -49,7 +49,7 @@ async function insertSampleData(db) {
     // 插入数据 - 使用SQLite语法
     for (const user of sampleUsers) {
       await db.execute(`
-        INSERT INTO user 
+        INSERT INTO users 
         (role, school, name, encrypted_pwd, student_id, teacher_id, child_name)
         VALUES (?, ?, ?, ?, ?, ?, ?)
       `, [

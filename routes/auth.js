@@ -34,19 +34,19 @@ export async function loginHandler(req, res) {
     
     if (role === 'student') {
       // 对于学生，可以通过name或student_id查找
-      query = 'SELECT * FROM user WHERE role = ? AND (name = ? OR student_id = ?)';
+      query = 'SELECT * FROM users WHERE role = ? AND (name = ? OR student_id = ?)';
       params = [role, username, username];
     } else if (role === 'teacher') {
       // 对于教师，可以通过name或teacher_id查找
-      query = 'SELECT * FROM user WHERE role = ? AND (name = ? OR teacher_id = ?)';
+      query = 'SELECT * FROM users WHERE role = ? AND (name = ? OR teacher_id = ?)';
       params = [role, username, username];
     } else if (role === 'parent') {
       // 对于家长，可以通过name或child_name查找
-      query = 'SELECT * FROM user WHERE role = ? AND (name = ? OR child_name = ?)';
+      query = 'SELECT * FROM users WHERE role = ? AND (name = ? OR child_name = ?)';
       params = [role, username, username];
     } else {
       // 其他角色默认通过name查找
-      query = 'SELECT * FROM user WHERE role = ? AND name = ?';
+      query = 'SELECT * FROM users WHERE role = ? AND name = ?';
       params = [role, username];
     }
     
