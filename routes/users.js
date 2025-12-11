@@ -1,5 +1,5 @@
 // Cloudflare Workers 兼容版本
-import { hashPassword } from '../utils/password';
+import { hashPassword } from '../utils/password.js';
 
 // CORS配置
 const corsHeaders = {

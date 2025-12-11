@@ -1,5 +1,5 @@
 // Cloudflare Workers 兼容版本
-import { verifyPassword } from '../utils/password';
+import { verifyPassword } from '../utils/password.js';
 
 // CORS配置
 const corsHeaders = {
@@ -125,9 +125,17 @@ export async function loginHandler(req, res) {
     
   } catch (error) {
     console.error('登录错误:', error);
+    console.error('错误类型:', typeof error);
+    console.error('错误堆栈:', error.stack);
+    console.error('错误名称:', error.name);
+    console.error('错误信息:', error.message);
+    
+    // 返回更详细的错误信息，仅用于调试
     return new Response(JSON.stringify({ 
       success: false, 
-      message: '服务器错误' 
+      message: '服务器错误',
+      error: error.message,  // 仅用于调试，生产环境应移除
+      stack: error.stack     // 仅用于调试，生产环境应移除
     }), { 
       status: 500, 
       headers: { ...corsHeaders, 'Content-Type': 'application/json' } 

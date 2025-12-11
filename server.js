@@ -1,8 +1,8 @@
 // Cloudflare Workers 兼容版本
-import { connectDB } from './config/db';
-import { initTables } from './config/initDB';
-import authRoutes from './routes/auth';
-import usersRoutes from './routes/users';
+import { connectDB } from './config/db.js';
+import { initTables } from './config/initDB.js';
+import authRoutes from './routes/auth.js';
+import usersRoutes from './routes/users.js';
 
 // CORS配置
 const corsHeaders = {
@@ -20,9 +20,17 @@ async function handleRequest(request, env, ctx) {
     });
   }
 
-  // 初始化数据库
-  ctx.waitUntil(connectDB(env.DB));
-  ctx.waitUntil(initTables(env.DB));
+  // 初始化数据库（同步完成，确保路由处理前数据库已准备好）
+  try {
+    await connectDB(env.DB);
+    await initTables(env.DB);
+  } catch (dbError) {
+    console.error('数据库初始化失败:', dbError);
+    return new Response(JSON.stringify({ error: '数据库初始化失败' }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
 
   // 解析URL
   const url = new URL(request.url);
