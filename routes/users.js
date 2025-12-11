@@ -31,13 +31,13 @@ export async function addUserHandler(req, res) {
     let checkParams = [];
     
     if (role === 'student') {
-      checkQuery = 'SELECT * FROM user WHERE role = ? AND (name = ? OR student_id = ?)';
+      checkQuery = 'SELECT * FROM users WHERE role = ? AND (name = ? OR student_id = ?)';
       checkParams = [role, username, username];
     } else if (role === 'teacher') {
-      checkQuery = 'SELECT * FROM user WHERE role = ? AND (name = ? OR teacher_id = ?)';
+      checkQuery = 'SELECT * FROM users WHERE role = ? AND (name = ? OR teacher_id = ?)';
       checkParams = [role, username, username];
     } else {
-      checkQuery = 'SELECT * FROM user WHERE role = ? AND name = ?';
+      checkQuery = 'SELECT * FROM users WHERE role = ? AND name = ?';
       checkParams = [role, username];
     }
     
@@ -56,7 +56,7 @@ export async function addUserHandler(req, res) {
     // 插入新用户 - 使用SQLite语法
     const hashedPassword = await hashPassword(password);
     const result = await db.execute(
-      `INSERT INTO user 
+      `INSERT INTO users 
        (role, name, encrypted_pwd, school, student_id, teacher_id, child_name) 
        VALUES (?, ?, ?, ?, ?, ?, ?)
        RETURNING id`,
@@ -96,11 +96,11 @@ export async function getUserListHandler(req, res) {
     
     if (role && role !== 'all') {
       // 根据角色获取用户
-      query = 'SELECT id, role, name, school, student_id, teacher_id, child_name FROM user WHERE role = ? ORDER BY id DESC';
+      query = 'SELECT id, role, name, school, student_id, teacher_id, child_name FROM users WHERE role = ? ORDER BY id DESC';
       params = [role];
     } else {
       // 获取所有用户
-      query = 'SELECT id, role, name, school, student_id, teacher_id, child_name FROM user ORDER BY id DESC';
+      query = 'SELECT id, role, name, school, student_id, teacher_id, child_name FROM users ORDER BY id DESC';
     }
     
     const result = await db.execute(query, params);
@@ -141,5 +141,12 @@ export default async function usersRoutes(req, res) {
     return getUserListHandler(req, res);
   }
   
-  return null;
+  // 没有匹配的路由，返回404
+  return new Response(JSON.stringify({ 
+    success: false, 
+    message: '未找到接口' 
+  }), { 
+    status: 404, 
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+  });
 }

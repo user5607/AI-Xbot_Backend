@@ -51,8 +51,19 @@ export async function loginHandler(req, res) {
     }
     
     // 执行查询
+    console.log('执行数据库查询:', query, params);
     const result = await db.execute(query, params);
-    const user = result.results[0];
+    console.log('查询结果:', result);
+    
+    // 处理不同的D1查询结果格式
+    let user = null;
+    if (result.results && Array.isArray(result.results) && result.results.length > 0) {
+      user = result.results[0];
+    } else if (result && Array.isArray(result) && result.length > 0) {
+      user = result[0];
+    } else {
+      console.log('未找到用户');
+    }
     
     if (!user) {
       console.log('用户不存在');
@@ -135,5 +146,12 @@ export default async function authRoutes(req, res) {
     return loginHandler(req, res);
   }
   
-  return null;
+  // 没有匹配的路由，返回404
+  return new Response(JSON.stringify({ 
+    success: false, 
+    message: '未找到接口' 
+  }), { 
+    status: 404, 
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+  });
 }
