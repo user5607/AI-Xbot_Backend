@@ -1,6 +1,6 @@
 // Cloudflare Workers 兼容版本
 import { connectDB } from './config/db.js';
-import { initTables } from 'initDB.js';
+import { initTables } from './config/initDB.js';
 import authRoutes from './routes/auth.js';
 import usersRoutes from './routes/users.js';
 
