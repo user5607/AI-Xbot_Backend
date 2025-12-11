@@ -1,19 +1,19 @@
 // Cloudflare D1 数据库初始化配置
 
-// 初始化表结构 - 只保留必要的表创建功能，去掉示例数据插入
+// 初始化表结构 - 只保留必要的表创建功能
 async function initTables(db) {
   try {
-    // 创建users表 - 使用SQLite语法，在原有结构基础上添加必要字段
+    // 创建users表 - 使用SQLite语法，确保包含所有必需字段
     await db.execute(`
       CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        school TEXT,
-        name TEXT,
-        encrypted_pwd TEXT,
-        role TEXT, -- 添加角色字段：student/teacher/parent
-        student TEXT, -- 添加学号字段（注意：数据库中实际字段名为student）
-        teacher_id TEXT, -- 添加工号字段
-        child_name TEXT -- 添加孩子姓名字段（家长用户使用）
+        school TEXT NOT NULL,
+        name TEXT NOT NULL,
+        encrypted_pwd TEXT NOT NULL,
+        role TEXT NOT NULL, -- 角色字段：student/teacher/parent
+        student TEXT, -- 学号字段
+        teacher_id TEXT, -- 工号字段
+        child_name TEXT -- 孩子姓名字段（家长用户使用）
       )
     `);
     

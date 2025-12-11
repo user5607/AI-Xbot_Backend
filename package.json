@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "initdb": "node config/initDB.js",
+    "initdb": "node config/initdb.js",
     "dev": "wrangler dev",
     "deploy": "wrangler deploy"
   },

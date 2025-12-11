@@ -3,7 +3,7 @@ import { hashPassword } from '../utils/password.js';
 
 // CORS配置
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': 'https://aixbot.pages.dev',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Access-Control-Max-Age': '86400',
@@ -31,7 +31,7 @@ export async function addUserHandler(req, res, env) {
     let checkParams = [];
     
     if (role === 'student') {
-      checkQuery = 'SELECT * FROM users WHERE role = ? AND (name = ? OR student_id = ?)';
+      checkQuery = 'SELECT * FROM users WHERE role = ? AND (name = ? OR student = ?)';
       checkParams = [role, username, username];
     } else if (role === 'teacher') {
       checkQuery = 'SELECT * FROM users WHERE role = ? AND (name = ? OR teacher_id = ?)';
@@ -57,7 +57,7 @@ export async function addUserHandler(req, res, env) {
     const hashedPassword = await hashPassword(password);
     const result = await db.execute(
       `INSERT INTO users 
-       (role, name, encrypted_pwd, school, student_id, teacher_id, child_name) 
+       (role, name, encrypted_pwd, school, student, teacher_id, child_name) 
        VALUES (?, ?, ?, ?, ?, ?, ?)
        RETURNING id`,
       [role, realName, hashedPassword, school, studentId, teacherId, childName]
@@ -96,11 +96,11 @@ export async function getUserListHandler(req, res, env) {
     
     if (role && role !== 'all') {
       // 根据角色获取用户
-      query = 'SELECT id, role, name, school, student_id, teacher_id, child_name FROM users WHERE role = ? ORDER BY id DESC';
+      query = 'SELECT id, role, name, school, student, teacher_id, child_name FROM users WHERE role = ? ORDER BY id DESC';
       params = [role];
     } else {
       // 获取所有用户
-      query = 'SELECT id, role, name, school, student_id, teacher_id, child_name FROM users ORDER BY id DESC';
+      query = 'SELECT id, role, name, school, student, teacher_id, child_name FROM users ORDER BY id DESC';
     }
     
     const result = await db.execute(query, params);

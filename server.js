@@ -1,14 +1,15 @@
 // Cloudflare Workers 兼容版本
 import { connectDB } from './config/db.js';
-import { initTables } from './config/initDB.js';
+import { initTables } from './config/initdb.js';
 import authRoutes from './routes/auth.js';
 import usersRoutes from './routes/users.js';
 
 // CORS配置
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': 'https://aixbot.pages.dev',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Access-Control-Max-Age': '86400',
 };
 
 // 路由处理函数

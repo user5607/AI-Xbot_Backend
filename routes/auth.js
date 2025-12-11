@@ -3,7 +3,7 @@ import { verifyPassword } from '../utils/password.js';
 
 // CORS配置
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': 'https://aixbot.pages.dev',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Access-Control-Max-Age': '86400',
@@ -72,6 +72,30 @@ export async function loginHandler(req, res, env) {
         message: '用户名或密码错误' 
       }), { 
         status: 401, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      });
+    }
+    
+    // 验证用户记录包含所有必需的字段
+    const requiredFields = ['school', 'name', 'encrypted_pwd', 'role'];
+    const missingFields = requiredFields.filter(field => !user[field]);
+    
+    // 根据角色验证特定字段
+    if (user.role === 'student' && !user.student) {
+      missingFields.push('student_id');
+    } else if (user.role === 'teacher' && !user.teacher_id) {
+      missingFields.push('teacher_id');
+    } else if (user.role === 'parent' && !user.child_name) {
+      missingFields.push('child_name');
+    }
+    
+    if (missingFields.length > 0) {
+      console.log('用户记录缺少必要字段:', missingFields);
+      return new Response(JSON.stringify({ 
+        success: false, 
+        message: '用户信息不完整，请联系管理员' 
+      }), { 
+        status: 400, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       });
     }
